@@ -96,7 +96,7 @@ export function useCollection<T = any>(
 
     const fetchCollection = async () => {
       try {
-        const res = await fetch(`/api/db?table=${tableName}`);
+        const res = await fetch(`/api/gateway?table=${tableName}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch ${tableName}: ${res.statusText}`);
         }
