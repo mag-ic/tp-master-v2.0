@@ -10,24 +10,7 @@ const Help: React.FC<HelpProps> = ({ onReset, onImport }) => {
   const [importing, setImporting] = React.useState(false);
 
   const handleAutoImport = async () => {
-    setImporting(true);
-    try {
-      const response = await fetch('/api/backup');
-      if (!response.ok) {
-        throw new Error("Fichier de sauvegarde Backup_TPMaster*.json non trouvé à la racine.");
-      }
-      const json = await response.json();
-      if (!json.data) {
-        alert("Le format du fichier de sauvegarde est invalide.");
-        return;
-      }
-      await onImport(json.data);
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Erreur lors de l'importation automatique.");
-    } finally {
-      setImporting(false);
-    }
+    alert("L'importation automatique à la racine est une fonctionnalité réservée au développement local. En production, veuillez importer vos données manuellement à l'aide du bouton 'Choisir un fichier JSON' ci-dessous.");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
