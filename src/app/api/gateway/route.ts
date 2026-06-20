@@ -13,10 +13,13 @@ pg.types.setTypeParser(20, function(val) {
   return val === null ? null : parseInt(val, 10);
 });
 
-const connectionString = 'postgresql://postgres.ygkvvgvixjcjlzzciluf:FFMm&Njuz_Jv5Z$@aws-0-eu-west-1.pooler.supabase.com:6543/postgres';
+const connectionString = 'postgresql://postgres.ygkvvgvixjcjlzzciluf:FFMm&Njuz_Jv5Z$@aws-0-eu-west-1.pooler.supabase.com:5432/postgres';
 
 const pool = new pg.Pool({
   connectionString,
+  ssl: {
+    rejectUnauthorized: false
+  },
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
