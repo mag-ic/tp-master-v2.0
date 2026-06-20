@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Product, SparePart } from '@/lib/types';
 import { exportToCsv } from '@/lib/utils';
+import { CsvImportButton } from './CsvImportButton';
 import { Download, Trash2, Edit3, Settings2, Search, Lock, Plus, X, Package } from 'lucide-react';
 import {
   AlertDialog,
