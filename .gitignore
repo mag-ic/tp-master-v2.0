@@ -49,3 +49,4 @@ Backup_TPMaster*.json
 application.zip
 create-archive.ps1
 import-to-supabase.js
+create-migration-table.js
