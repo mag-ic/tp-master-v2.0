@@ -15,7 +15,7 @@ export function setDocumentNonBlocking(docRef: any, data: any, options?: any) {
     return;
   }
 
-  fetch('/api/db', {
+  fetch('/api/gateway', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'set', table: tableName, id: docId, data })
@@ -50,7 +50,7 @@ export function addDocumentNonBlocking(colRef: any, data: any) {
   const generatedId = `${tableName.substring(0, 3)}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   const extendedData = { ...data, id: generatedId };
 
-  const promise = fetch('/api/db', {
+  const promise = fetch('/api/gateway', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'set', table: tableName, id: generatedId, data: extendedData })
@@ -86,7 +86,7 @@ export function updateDocumentNonBlocking(docRef: any, data: any) {
     return;
   }
 
-  fetch('/api/db', {
+  fetch('/api/gateway', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'update', table: tableName, id: docId, data })
@@ -118,7 +118,7 @@ export function deleteDocumentNonBlocking(docRef: any) {
     return;
   }
 
-  fetch('/api/db', {
+  fetch('/api/gateway', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'delete', table: tableName, id: docId })

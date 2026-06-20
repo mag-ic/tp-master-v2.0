@@ -90,7 +90,7 @@ export function useDoc<T = any>(
 
     const fetchDoc = async () => {
       try {
-        const res = await fetch(`/api/db?table=${tableName}&id=${docId}`);
+        const res = await fetch(`/api/gateway?table=${tableName}&id=${docId}`);
         if (res.status === 404) {
           if (active) {
             setData(null);
