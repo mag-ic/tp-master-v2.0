@@ -46,3 +46,5 @@ firestore-debug.log
 
 # backups
 Backup_TPMaster*.json
+application.zip
+create-archive.ps1
