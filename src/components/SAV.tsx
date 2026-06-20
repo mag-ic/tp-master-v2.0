@@ -132,6 +132,14 @@ const SAV: React.FC<SAVProps> = ({ tickets, clients, products, onCreateTicket, o
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => exportToCsv('tickets_sav.csv', filteredTickets)} className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-black uppercase flex items-center gap-2"><Download className="w-4 h-4" />CSV</button>
+          {!isReadOnly && (
+            <CsvImportButton
+              tableName="savtickets"
+              schemaKeys={['ticketNumber', 'clientName', 'productName', 'description', 'status', 'createdAt']}
+              idPrefix="sav"
+              className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+            />
+          )}
           {isReadOnly && <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl text-slate-400 font-bold text-[10px] border border-slate-200 uppercase tracking-widest"><Lock className="w-3 h-3" /> Consultation</div>}
         </div>
       </header>
