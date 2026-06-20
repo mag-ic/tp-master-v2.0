@@ -47,6 +47,38 @@ const Payments: React.FC<PaymentsProps> = ({
   const [viewHistoryItem, setViewHistoryItem] = useState<Payment | Charge | null>(null);
   const [editingInvoice, setEditingInvoice] = useState<Payment | null>(null);
   const [editItems, setEditItems] = useState<InvoiceItem[]>([]);
+
+  const csvImportConfig = useMemo(() => {
+    if (activeTab === 'list') {
+      return {
+        tableName: 'payments',
+        schemaKeys: ['invoiceNumber', 'customerName', 'amount', 'paidAmount', 'date', 'dueDate', 'status', 'method', 'isReceived'],
+        defaultValues: {},
+        idPrefix: 'pay'
+      };
+    } else if (activeTab === 'apports') {
+      return {
+        tableName: 'apports',
+        schemaKeys: ['reference', 'amount', 'date', 'method', 'description'],
+        defaultValues: {},
+        idPrefix: 'apr'
+      };
+    } else if (activeTab === 'achat') {
+      return {
+        tableName: 'charges',
+        schemaKeys: ['reference', 'supplierName', 'description', 'category', 'amount', 'paidAmount', 'status', 'date', 'method', 'responsible'],
+        defaultValues: { category: 'Marchandises', status: 'UNPAID', paidAmount: 0 },
+        idPrefix: 'chg'
+      };
+    } else { // activeTab === 'charges'
+      return {
+        tableName: 'charges',
+        schemaKeys: ['reference', 'supplierName', 'description', 'category', 'amount', 'paidAmount', 'status', 'date', 'method', 'responsible'],
+        defaultValues: { status: 'UNPAID', paidAmount: 0 },
+        idPrefix: 'chg'
+      };
+    }
+  }, [activeTab]);
   
   // FILTERS
   const [searchTerm, setSearchTerm] = useState('');
