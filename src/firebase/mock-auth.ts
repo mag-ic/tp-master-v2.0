@@ -57,18 +57,25 @@ class MockAuth {
 export const mockAuth = new MockAuth();
 
 export async function signInWithEmailAndPassword(auth: any, email: string, pass: string) {
-  if (email.trim() === 'ali@tpmaster.com' && pass === '12345678') {
-    const mockUser = {
-      uid: 'ali-uid',
-      email: 'ali@tpmaster.com',
-      emailVerified: true,
-      displayName: 'Ali'
-    };
+  const cleanEmail = email.trim().toLowerCase();
+  
+  let userObject = null;
+  if (cleanEmail === 'ali@tpmaster.com' && pass === '12345678') {
+    userObject = { uid: 'ali-uid', email: 'ali@tpmaster.com', emailVerified: true, displayName: 'Ali' };
+  } else if (cleanEmail === 'admin@tpmaster.com' && pass === '12345678') {
+    userObject = { uid: 'admin-uid', email: 'admin@tpmaster.com', emailVerified: true, displayName: 'Admin' };
+  } else if (cleanEmail === 'tarik@tpmaster.ma' && pass === '12345678') {
+    userObject = { uid: 'tarik-uid', email: 'tarik@tpmaster.ma', emailVerified: true, displayName: 'Tarik' };
+  } else if (cleanEmail === 'ghalem092@gmail.com' && pass === 'MW_Pgy5xf4@q(MM') {
+    userObject = { uid: 'ghalem-uid', email: 'ghalem092@gmail.com', emailVerified: true, displayName: 'Ghalem' };
+  }
+
+  if (userObject) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('tpmaster_session', JSON.stringify(mockUser));
+      localStorage.setItem('tpmaster_session', JSON.stringify(userObject));
     }
-    mockAuth.triggerStateChange(mockUser);
-    return { user: mockUser };
+    mockAuth.triggerStateChange(userObject);
+    return { user: userObject };
   } else {
     // Throw standard Firebase auth exception structure to be compatible with Login.tsx
     const err: any = new Error('auth/wrong-password');
