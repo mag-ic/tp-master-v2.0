@@ -30,6 +30,9 @@ export const CsvImportButton: React.FC<CsvImportButtonProps> = ({
   const configCol = useMemoFirebase(() => doc(firestore, 'config', 'app'), [firestore]);
   const { data: config } = useDoc(configCol);
   const effectiveUid = user?.email === 'tarik@tpmaster.ma' ? config?.adminUid : user?.uid;
+  const isReadOnly = user?.email === 'tarik@tpmaster.ma';
+
+  if (isReadOnly) return null;
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
