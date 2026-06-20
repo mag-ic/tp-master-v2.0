@@ -55,39 +55,89 @@ export function useDoc<T = any>(
       return;
     }
 
+    const path = (memoizedDocRef as any).path || '';
+    
+    // Intercept config/app requests to mock config instantly
+    if (path === 'config/app' || path.startsWith('config/')) {
+      setData({ id: 'app', adminUid: 'ali-uid' } as any);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    const parts = path.split('/');
+    if (parts.length < 2) {
+      setData(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    const tableName = parts[parts.length - 2];
+    const docId = parts[parts.length - 1];
+
+    if (!tableName || !docId) {
+      setData(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
 
-    const unsubscribe = onSnapshot(
-      memoizedDocRef,
-      (snapshot: DocumentSnapshot<DocumentData>) => {
-        if (snapshot.exists()) {
-          setData({ ...(snapshot.data() as T), id: snapshot.id });
-        } else {
-          // Document does not exist
-          setData(null);
+    let active = true;
+
+    const fetchDoc = async () => {
+      try {
+        const res = await fetch(`/api/db?table=${tableName}&id=${docId}`);
+        if (res.status === 404) {
+          if (active) {
+            setData(null);
+            setError(null);
+          }
+          return;
         }
-        setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
-        setIsLoading(false);
-      },
-      (error: FirestoreError) => {
-        const contextualError = new FirestorePermissionError({
-          operation: 'get',
-          path: memoizedDocRef.path,
-        })
-
-        setError(contextualError)
-        setData(null)
-        setIsLoading(false)
-
-        // trigger global error propagation
-        errorEmitter.emit('permission-error', contextualError);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch doc ${docId} from ${tableName}: ${res.statusText}`);
+        }
+        const jsonData = await res.json();
+        if (active) {
+          setData(jsonData);
+          setError(null);
+        }
+      } catch (e: any) {
+        if (active) {
+          console.error(`Error fetching doc ${docId} on table ${tableName}:`, e);
+          setError(e);
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
       }
-    );
+    };
 
-    return () => unsubscribe();
-  }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
+    fetchDoc();
+
+    // Listen to local changes
+    const { dbEmitter } = require('../database-emitter');
+    const handleDBChange = (event: { table: string }) => {
+      if (event.table.toLowerCase() === tableName.toLowerCase()) {
+        fetchDoc();
+      }
+    };
+    dbEmitter.on(handleDBChange);
+
+    // Poll every 10 seconds for concurrent changes
+    const interval = setInterval(fetchDoc, 10000);
+
+    return () => {
+      active = false;
+      dbEmitter.off(handleDBChange);
+      clearInterval(interval);
+    };
+  }, [memoizedDocRef]);
 
   return { data, isLoading, error };
 }

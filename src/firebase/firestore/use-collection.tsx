@@ -69,44 +69,75 @@ export function useCollection<T = any>(
       return;
     }
 
+    let path = '';
+    if ((memoizedTargetRefOrQuery as any).path) {
+      path = (memoizedTargetRefOrQuery as any).path;
+    } else if ((memoizedTargetRefOrQuery as any)._query?.path?.canonicalString) {
+      path = (memoizedTargetRefOrQuery as any)._query.path.canonicalString();
+    } else if (typeof memoizedTargetRefOrQuery === 'object') {
+      // Fallback path extraction
+      path = (memoizedTargetRefOrQuery as any).toString() || '';
+    }
+
+    const parts = path.split('/');
+    const tableName = parts[parts.length - 1];
+
+    if (!tableName) {
+      setData(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
-    // Directly use memoizedTargetRefOrQuery as it's assumed to be the final query
-    const unsubscribe = onSnapshot(
-      memoizedTargetRefOrQuery,
-      (snapshot: QuerySnapshot<DocumentData>) => {
-        const results: ResultItemType[] = [];
-        for (const doc of snapshot.docs) {
-          results.push({ ...(doc.data() as T), id: doc.id });
+    let active = true;
+
+    const fetchCollection = async () => {
+      try {
+        const res = await fetch(`/api/db?table=${tableName}`);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch ${tableName}: ${res.statusText}`);
         }
-        setData(results);
-        setError(null);
-        setIsLoading(false);
-      },
-      (error: FirestoreError) => {
-        // This logic extracts the path from either a ref or a query
-        const path: string =
-          memoizedTargetRefOrQuery.type === 'collection'
-            ? (memoizedTargetRefOrQuery as CollectionReference).path
-            : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query.path.canonicalString()
-
-        const contextualError = new FirestorePermissionError({
-          operation: 'list',
-          path,
-        })
-
-        setError(contextualError)
-        setData(null)
-        setIsLoading(false)
-
-        // trigger global error propagation
-        errorEmitter.emit('permission-error', contextualError);
+        const jsonData = await res.json();
+        if (active) {
+          setData(jsonData);
+          setError(null);
+        }
+      } catch (e: any) {
+        if (active) {
+          console.error(`Error fetching collection ${tableName}:`, e);
+          setError(e);
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
       }
-    );
+    };
 
-    return () => unsubscribe();
-  }, [memoizedTargetRefOrQuery]); // Re-run if the target query/reference changes.
+    fetchCollection();
+
+    // Listen to local database changes
+    const { dbEmitter } = require('../database-emitter');
+    const handleDBChange = (event: { table: string }) => {
+      if (event.table.toLowerCase() === tableName.toLowerCase()) {
+        fetchCollection();
+      }
+    };
+    dbEmitter.on(handleDBChange);
+
+    // Poll every 10 seconds for concurrent mutations
+    const interval = setInterval(fetchCollection, 10000);
+
+    return () => {
+      active = false;
+      dbEmitter.off(handleDBChange);
+      clearInterval(interval);
+    };
+  }, [memoizedTargetRefOrQuery]);
+
   if(memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
     throw new Error(memoizedTargetRefOrQuery + ' was not properly memoized using useMemoFirebase');
   }
