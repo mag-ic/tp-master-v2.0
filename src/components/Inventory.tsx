@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Product, StockStatus } from '@/lib/types';
 import { exportToCsv } from '@/lib/utils';
+import { CsvImportButton } from './CsvImportButton';
 import { Download, Trash2, Edit3, Package, Search, Lock, AlertTriangle, X } from 'lucide-react';
 import {
   AlertDialog,
