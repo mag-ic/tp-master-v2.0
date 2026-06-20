@@ -2,14 +2,32 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const auth = useAuth();
+
+  const handleResetPassword = () => {
+    const email = username.trim();
+    if (!email.includes('@')) {
+      alert("Veuillez saisir une adresse e-mail valide dans le champ Identifiant.");
+      return;
+    }
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        setResetSent(true);
+        alert(`Un e-mail de réinitialisation de mot de passe a été envoyé à : ${email}`);
+      })
+      .catch((err) => {
+        console.error("Reset password error", err);
+        alert(`Erreur lors de l'envoi de l'e-mail: ${err.message}`);
+      });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,8 +116,22 @@ const Login: React.FC = () => {
             </div>
 
             {error && (
-              <div className="bg-rose-500/10 text-rose-500 text-[11px] font-black p-4 rounded-2xl text-center animate-shake uppercase tracking-widest border border-rose-500/20">
-                Accès refusé. Compte inexistant ou informations incorrectes.
+              <div className="space-y-3">
+                <div className="bg-rose-500/10 text-rose-500 text-[11px] font-black p-4 rounded-2xl text-center animate-shake uppercase tracking-widest border border-rose-500/20">
+                  Accès refusé. Mot de passe incorrect ou e-mail déjà existant.
+                </div>
+                <div className="flex flex-col gap-2 text-center">
+                  <button
+                    type="button"
+                    onClick={handleResetPassword}
+                    className="text-blue-400 hover:text-blue-300 text-xs font-bold transition-colors underline"
+                  >
+                    Mot de passe oublié ? Réinitialiser
+                  </button>
+                  <p className="text-[10px] text-slate-500 font-medium">
+                    Astuce : essayez un autre e-mail (ex: ali-test@tpmaster.com) pour créer un nouveau compte de test.
+                  </p>
+                </div>
               </div>
             )}
 
