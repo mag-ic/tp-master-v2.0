@@ -128,6 +128,15 @@ const Contacts: React.FC<ContactsProps> = ({ contacts, onAddContact, onEditConta
         <div><h2 className="text-3xl font-black text-slate-900 tracking-tight">Partenaires</h2><p className="text-sm text-slate-500 mt-1 font-medium">Gérez votre écosystème de clients et fournisseurs.</p></div>
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <button onClick={() => exportToCsv(`contacts_${activeTab}.csv`, filteredContacts)} className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 flex items-center justify-center gap-2"><Download className="w-4 h-4" />EXPORTER CSV</button>
+          {!isReadOnly && (
+            <CsvImportButton
+              tableName="contacts"
+              schemaKeys={['name', 'type', 'email', 'phone', 'address', 'city', 'ice', 'ifId']}
+              defaultValues={{ type: activeTab }}
+              idPrefix="ent"
+              className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 flex items-center justify-center gap-2 shadow-sm"
+            />
+          )}
           {!isReadOnly ? (
             <button onClick={handleOpenAddForm} className="flex-1 md:flex-none btn-primary flex items-center justify-center gap-2"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>NOUVEAU {activeTab === 'client' ? 'CLIENT' : 'FOURNISSEUR'}</button>
           ) : (
