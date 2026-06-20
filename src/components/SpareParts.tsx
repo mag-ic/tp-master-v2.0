@@ -92,6 +92,14 @@ const SpareParts: React.FC<SparePartsProps> = ({
               <Download className="w-4 h-4" />Exporter CSV
             </button>
             {!isReadOnly && (
+              <CsvImportButton
+                tableName="spareparts"
+                schemaKeys={['name', 'sku', 'productId', 'productName', 'stock', 'price', 'category']}
+                idPrefix="spr"
+                className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+              />
+            )}
+            {!isReadOnly && (
               <button onClick={() => { setEditingPart(null); setShowAddModal(true); }} className="btn-primary flex items-center justify-center gap-2">
                 <Plus className="w-5 h-5" />Nouvelle Pièce
               </button>
