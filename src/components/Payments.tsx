@@ -361,6 +361,15 @@ const Payments: React.FC<PaymentsProps> = ({
           {activeTab === 'achat' && !isReadOnly && (<button onClick={() => setShowAddPurchaseModal(true)} className="flex-1 md:flex-none px-6 py-3 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase flex items-center justify-center gap-2 shadow-lg hover:bg-blue-700 transition-all active:scale-95"><ShoppingCart className="w-4 h-4" /> Nouvel Achat</button>)}
           
           <button onClick={() => exportToCsv(`finance_${activeTab}.csv`, filteredData)} className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 shadow-sm flex items-center justify-center gap-2"><Download className="w-4 h-4" />EXPORTER CSV</button>
+          {!isReadOnly && (
+            <CsvImportButton
+              tableName={csvImportConfig.tableName}
+              schemaKeys={csvImportConfig.schemaKeys}
+              defaultValues={csvImportConfig.defaultValues}
+              idPrefix={csvImportConfig.idPrefix}
+              className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 shadow-sm flex items-center justify-center gap-2 active:scale-95"
+            />
+          )}
           
           <div className="flex bg-white p-1 rounded-full border border-slate-100 shadow-sm w-full md:w-auto overflow-x-auto no-scrollbar">
             {(['list', 'achat', 'charges', 'apports'] as const).map((tab) => (
