@@ -4,6 +4,7 @@ import { Product, Entity, StockEntry, StockEntryItem, SupplierAdvance, PaymentMe
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportToCsv } from '@/lib/utils';
+import { CsvImportButton } from './CsvImportButton';
 import { Download, FileText, Upload, X, Eye, Trash2, Lock, Edit3, Plus, Banknote, CreditCard, ClipboardList, Wallet, History, Search, CheckCircle2 } from 'lucide-react';
 import {
   AlertDialog,
