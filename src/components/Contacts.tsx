@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Entity, EntityType, Payment, Charge, PaymentStatus } from '@/lib/types';
 import { exportToCsv } from '@/lib/utils';
+import { CsvImportButton } from './CsvImportButton';
 import { Download, Search, MapPin, X, Trash2, Lock, Edit3, User, Phone, Mail, Clock, CreditCard } from 'lucide-react';
 import {
   AlertDialog,

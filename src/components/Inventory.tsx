@@ -87,6 +87,14 @@ const Inventory: React.FC<InventoryProps> = ({
               <Download className="w-4 h-4" />Exporter CSV
             </button>
             {!isReadOnly && (
+              <CsvImportButton
+                tableName="products"
+                schemaKeys={['name', 'sku', 'category', 'price', 'stock', 'minStock', 'declassedStock']}
+                idPrefix="prd"
+                className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+              />
+            )}
+            {!isReadOnly && (
               <button onClick={() => setShowAddModal(true)} className="btn-primary flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
                 Nouveau Produit
