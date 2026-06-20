@@ -58,3 +58,136 @@ export function exportToCsv(filename: string, rows: any[]) {
   link.click();
   document.body.removeChild(link);
 }
+
+export function parseCsv(text: string): Record<string, string>[] {
+  const lines: string[][] = [];
+  let row: string[] = [];
+  let inQuotes = false;
+  let currentVal = '';
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentVal += '"';
+        i++; // skip next quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' || char === ';') { // support comma and semicolon separators
+      if (inQuotes) {
+        currentVal += char;
+      } else {
+        row.push(currentVal.trim());
+        currentVal = '';
+      }
+    } else if (char === '\r' || char === '\n') {
+      if (inQuotes) {
+        currentVal += char;
+      } else {
+        if (char === '\r' && nextChar === '\n') {
+          i++; // skip LF
+        }
+        row.push(currentVal.trim());
+        if (row.length > 0 && row.some(cell => cell !== '')) {
+          lines.push(row);
+        }
+        row = [];
+        currentVal = '';
+      }
+    } else {
+      currentVal += char;
+    }
+  }
+  if (currentVal !== '' || row.length > 0) {
+    row.push(currentVal.trim());
+    if (row.some(cell => cell !== '')) {
+      lines.push(row);
+    }
+  }
+
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].map(h => h.toLowerCase().trim().replace(/['"“”]/g, ''));
+  const results: Record<string, string>[] = [];
+
+  for (let r = 1; r < lines.length; r++) {
+    const line = lines[r];
+    const obj: Record<string, string> = {};
+    for (let c = 0; c < headers.length; c++) {
+      if (line[c] !== undefined) {
+        obj[headers[c]] = line[c];
+      } else {
+        obj[headers[c]] = '';
+      }
+    }
+    results.push(obj);
+  }
+
+  return results;
+}
+
+const NUMERIC_FIELDS = new Set([
+  'price', 'stock', 'minstock', 'declassedstock', 'amount', 
+  'paidamount', 'totalht', 'totalttc'
+]);
+
+const BOOLEAN_FIELDS = new Set([
+  'isreceived'
+]);
+
+const JSON_FIELDS = new Set([
+  'items'
+]);
+
+export function mapCsvRowsToSchema(csvRows: Record<string, string>[], schemaKeys: string[], defaultValues: Record<string, any> = {}): any[] {
+  return csvRows.map(row => {
+    const obj: any = { ...defaultValues };
+    
+    for (const key of schemaKeys) {
+      const lowerKey = key.toLowerCase();
+      let csvValue: string | undefined = undefined;
+      
+      for (const csvKey of Object.keys(row)) {
+        if (csvKey.toLowerCase().replace(/[\s_-]/g, '') === lowerKey.replace(/[\s_-]/g, '')) {
+          csvValue = row[csvKey];
+          break;
+        }
+      }
+      
+      if (csvValue !== undefined && csvValue !== null) {
+        if (NUMERIC_FIELDS.has(lowerKey)) {
+          const cleanVal = csvValue.replace(/,/g, '.').replace(/[^0-9.-]/g, '');
+          obj[key] = parseFloat(cleanVal) || 0;
+        } else if (BOOLEAN_FIELDS.has(lowerKey)) {
+          const valLower = csvValue.toLowerCase().trim();
+          obj[key] = valLower === 'true' || valLower === 'vrai' || valLower === '1' || valLower === 'yes' || valLower === 'oui';
+        } else if (JSON_FIELDS.has(lowerKey)) {
+          try {
+            obj[key] = JSON.parse(csvValue);
+          } catch (e) {
+            obj[key] = [];
+          }
+        } else {
+          obj[key] = csvValue;
+        }
+      } else {
+        if (obj[key] === undefined) {
+          if (NUMERIC_FIELDS.has(lowerKey)) {
+            obj[key] = 0;
+          } else if (BOOLEAN_FIELDS.has(lowerKey)) {
+            obj[key] = false;
+          } else if (JSON_FIELDS.has(lowerKey)) {
+            obj[key] = [];
+          } else {
+            obj[key] = '';
+          }
+        }
+      }
+    }
+    
+    return obj;
+  });
+}
