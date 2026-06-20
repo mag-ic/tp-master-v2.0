@@ -1,0 +1,249 @@
+
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the application.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the user (matches auth.uid)." },
+        "email": { "type": "string", "description": "Email address of the user.", "format": "email" }
+      },
+      "required": ["id", "email"]
+    },
+    "Product": {
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a product in the inventory.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "sku": { "type": "string", "description": "Used as the Brand (Marque) of the product." },
+        "category": { "type": "string" },
+        "price": { "type": "number" },
+        "stock": { "type": "number" },
+        "minStock": { "type": "number" },
+        "declassedStock": { "type": "number", "default": 0 }
+      },
+      "required": ["id", "name", "sku", "price", "stock", "minStock", "declassedStock"]
+    },
+    "SparePart": {
+      "title": "SparePart",
+      "type": "object",
+      "description": "Represents a spare part linked to a product.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "sku": { "type": "string" },
+        "productId": { "type": "string", "description": "Reference to the main product." },
+        "productName": { "type": "string" },
+        "stock": { "type": "number" },
+        "price": { "type": "number" },
+        "category": { "type": "string" }
+      },
+      "required": ["id", "name", "productId", "stock", "price"]
+    },
+    "Contact": {
+      "title": "Contact",
+      "type": "object",
+      "description": "Represents a client or supplier.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["client", "supplier"] },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "city": { "type": "string" },
+        "ice": { "type": "string" },
+        "ifId": { "type": "string" }
+      },
+      "required": ["id", "name", "type", "email", "phone"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "type": "object",
+      "description": "Represents a payment from a customer.",
+      "properties": {
+        "id": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "customerName": { "type": "string" },
+        "amount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "dueDate": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["Payé", "Partiel", "Non payé", "En retard"] },
+        "method": { "type": "string", "enum": ["Chèque", "Virement", "Espèces"] },
+        "isReceived": { "type": "boolean" }
+      },
+      "required": ["id", "invoiceNumber", "customerName", "amount", "paidAmount", "date", "dueDate", "status"]
+    },
+    "Charge": {
+      "title": "Charge",
+      "type": "object",
+      "description": "Represents a business expense.",
+      "properties": {
+        "id": { "type": "string" },
+        "reference": { "type": "string" },
+        "supplierName": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "amount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Payé", "Partiel", "Non payé"] },
+        "date": { "type": "string", "format": "date" },
+        "method": { "type": "string", "enum": ["Chèque", "Virement", "Espèces"] },
+        "responsible": { "type": "string", "description": "Name of the person responsible for the charge." }
+      },
+      "required": ["id", "description", "category", "amount", "paidAmount", "status", "date", "method"]
+    },
+    "Delivery": {
+      "title": "Delivery",
+      "type": "object",
+      "description": "Represents a product delivery to a customer.",
+      "properties": {
+        "id": { "type": "string" },
+        "deliveryNumber": { "type": "string" },
+        "totalHT": { "type": "number" },
+        "totalTTC": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "paymentMethod": { "type": "string", "enum": ["Chèque", "Virement", "Espèces"] },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" }
+      },
+      "required": ["id", "deliveryNumber", "totalTTC", "date", "clientId", "clientName"]
+    },
+    "StockEntry": {
+      "title": "StockEntry",
+      "type": "object",
+      "description": "Represents an entry of stock from a supplier.",
+      "properties": {
+        "id": { "type": "string" },
+        "entryNumber": { "type": "string" },
+        "totalTTC": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "supplierId": { "type": "string" },
+        "supplierName": { "type": "string" },
+        "attachmentUrl": { "type": "string", "description": "URL or Base64 of the linked document (PDF/Image)." },
+        "items": { "type": "array" }
+      },
+      "required": ["id", "entryNumber", "totalTTC", "date", "supplierId", "supplierName"]
+    },
+    "SAVTicket": {
+      "title": "SAVTicket",
+      "type": "object",
+      "description": "Represents a customer service ticket.",
+      "properties": {
+        "id": { "type": "string" },
+        "ticketNumber": { "type": "string" },
+        "clientName": { "type": "string" },
+        "productName": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["Nouveau", "Diagnostic", "En réparation", "Échange", "Clôturé"] },
+        "createdAt": { "type": "string", "format": "date" }
+      },
+      "required": ["id", "ticketNumber", "clientName", "productName", "description", "status", "createdAt"]
+    },
+    "Cheque": {
+      "title": "Cheque",
+      "type": "object",
+      "description": "Represents a bank check.",
+      "properties": {
+        "id": { "type": "string" },
+        "number": { "type": "string" },
+        "bank": { "type": "string" },
+        "amount": { "type": "number" },
+        "dueDate": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["Reçu", "Déposé", "Encaissé", "Impayé"] },
+        "type": { "type": "string", "enum": ["IN", "OUT"] }
+      },
+      "required": ["id", "number", "bank", "amount", "dueDate", "status", "type"]
+    },
+    "Apport": {
+      "title": "Apport",
+      "type": "object",
+      "description": "Represents a capital increase or partner contribution.",
+      "properties": {
+        "id": { "type": "string" },
+        "reference": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "method": { "type": "string", "enum": ["Chèque", "Virement", "Espèces"] },
+        "description": { "type": "string" }
+      },
+      "required": ["id", "reference", "amount", "date", "method"]
+    },
+    "SupplierAdvance": {
+      "title": "SupplierAdvance",
+      "type": "object",
+      "description": "Represents a payment made to a supplier before goods are received.",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "supplierId": { "type": "string" },
+        "supplierName": { "type": "string" },
+        "amount": { "type": "number" },
+        "method": { "type": "string", "enum": ["Chèque", "Virement", "Espèces"] },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["DISPONIBLE", "UTILISÉE", "ANNULÉE"] },
+        "linkedEntryNumber": { "type": "string" }
+      },
+      "required": ["id", "date", "supplierId", "supplierName", "amount", "method", "status"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profile information."
+    },
+    "/users/{userId}/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Stores products for a specific user."
+    },
+    "/users/{userId}/spareParts/{partId}": {
+      "schema": { "$ref": "#/entities/SparePart" },
+      "description": "Stores spare parts linked to products."
+    },
+    "/users/{userId}/contacts/{contactId}": {
+      "schema": { "$ref": "#/entities/Contact" },
+      "description": "Stores contacts (clients/suppliers) for a specific user."
+    },
+    "/users/{userId}/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/Payment" },
+      "description": "Stores payments for a specific user."
+    },
+    "/users/{userId}/charges/{chargeId}": {
+      "schema": { "$ref": "#/entities/Charge" },
+      "description": "Stores charges for a specific user."
+    },
+    "/users/{userId}/deliveries/{deliveryId}": {
+      "schema": { "$ref": "#/entities/Delivery" },
+      "description": "Stores deliveries for a specific user."
+    },
+    "/users/{userId}/stockEntries/{stockEntryId}": {
+      "schema": { "$ref": "#/entities/StockEntry" },
+      "description": "Stores stock entries for a specific user."
+    },
+    "/users/{userId}/savTickets/{savTicketId}": {
+      "schema": { "$ref": "#/entities/SAVTicket" },
+      "description": "Stores SAV tickets for a specific user."
+    },
+    "/users/{userId}/cheques/{chequeId}": {
+      "schema": { "$ref": "#/entities/Cheque" },
+      "description": "Stores cheques for a specific user."
+    },
+    "/users/{userId}/apports/{apportId}": {
+      "schema": { "$ref": "#/entities/Apport" },
+      "description": "Stores capital increases for a specific user."
+    },
+    "/users/{userId}/supplierAdvances/{advanceId}": {
+      "schema": { "$ref": "#/entities/SupplierAdvance" },
+      "description": "Stores advances paid to suppliers for a specific user."
+    }
+  }
+}

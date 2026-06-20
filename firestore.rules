@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isReadOnlyUser() {
+      return isSignedIn() && request.auth.token.email == 'tarik@tpmaster.ma';
+    }
+
+    // Configuration globale pour la redirection des données
+    match /config/app {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && !isReadOnlyUser();
+    }
+
+    // Profils utilisateurs et sous-collections
+    match /users/{userId} {
+      // Tarik peut lire toutes les données pour la consultation, mais ne peut jamais écrire
+      allow read: if isOwner(userId) || isReadOnlyUser();
+      allow write, delete: if isOwner(userId) && !isReadOnlyUser();
+
+      match /{collection}/{docId} {
+        allow read: if isOwner(userId) || isReadOnlyUser();
+        allow write, delete: if isOwner(userId) && !isReadOnlyUser();
+      }
+    }
+  }
+}
