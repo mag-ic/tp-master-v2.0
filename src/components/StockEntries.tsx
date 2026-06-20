@@ -36,6 +36,22 @@ const StockEntries: React.FC<StockEntriesProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'arrivages' | 'advances'>('arrivages');
   
+  const csvImportConfig = useMemo(() => {
+    if (activeTab === 'arrivages') {
+      return {
+        tableName: 'stockentries',
+        schemaKeys: ['entryNumber', 'totalTTC', 'date', 'supplierId', 'supplierName', 'attachmentUrl', 'items'],
+        idPrefix: 'ste'
+      };
+    } else {
+      return {
+        tableName: 'supplieradvances',
+        schemaKeys: ['date', 'supplierId', 'supplierName', 'amount', 'method', 'description', 'status', 'linkedEntryNumber'],
+        idPrefix: 'adv'
+      };
+    }
+  }, [activeTab]);
+  
   // States for Arrivages
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedSupplierId, setSelectedSupplierId] = useState('');
