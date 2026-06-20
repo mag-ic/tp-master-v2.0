@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Cheque, ChequeStatus } from '@/lib/types';
 import { exportToCsv } from '@/lib/utils';
+import { CsvImportButton } from './CsvImportButton';
 import { Download, Edit3, X } from 'lucide-react';
 
 interface RecouvrementProps {
@@ -112,6 +113,12 @@ const Recouvrement: React.FC<RecouvrementProps> = ({ cheques, onUpdateCheque }) 
                 <Download className="w-4 h-4" />
                 Exporter CSV
             </button>
+            <CsvImportButton
+                tableName="cheques"
+                schemaKeys={['number', 'bank', 'amount', 'dueDate', 'status', 'type']}
+                idPrefix="chq"
+                className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+            />
             <div className="flex items-center gap-3 bg-white/50 p-2 rounded-3xl border border-white">
                 <div className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest ${stats.overdue > 0 ? 'bg-rose-600 text-white animate-pulse' : 'bg-slate-100 text-slate-500'}`}>
                     {stats.overdue} Échéances passées
