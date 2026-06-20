@@ -297,6 +297,14 @@ const StockEntries: React.FC<StockEntriesProps> = ({
               <button onClick={() => exportToCsv(activeTab === 'arrivages' ? 'entrees.csv' : 'avances.csv', activeTab === 'arrivages' ? entries : advances)} className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 shadow-sm flex items-center justify-center gap-2">
                 <Download className="w-4 h-4" />EXPORTER CSV
               </button>
+              {!isReadOnly && (
+                <CsvImportButton
+                  tableName={csvImportConfig.tableName}
+                  schemaKeys={csvImportConfig.schemaKeys}
+                  idPrefix={csvImportConfig.idPrefix}
+                  className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 shadow-sm flex items-center justify-center gap-2 active:scale-95"
+                />
+              )}
               <div className="flex bg-white p-1 rounded-full border border-slate-100 shadow-sm overflow-x-auto no-scrollbar">
                 <button onClick={() => setActiveTab('arrivages')} className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase transition-all whitespace-nowrap ${activeTab === 'arrivages' ? 'bg-blue-50 text-blue-600 shadow-inner' : 'text-slate-400'}`}>Arrivages (BC)</button>
                 <button onClick={() => setActiveTab('advances')} className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase transition-all whitespace-nowrap ${activeTab === 'advances' ? 'bg-emerald-50 text-emerald-600 shadow-inner' : 'text-slate-400'}`}>Avances</button>
